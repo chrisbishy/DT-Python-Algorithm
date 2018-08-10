@@ -1,0 +1,108 @@
+import statistics
+import math
+
+## over and under values ##
+
+initial_x_resource = 1
+final_x_resource = 10000
+initial_y_resource = 1
+final_y_resource = 10000
+initial_z_resource = 1
+final_z_resource = 10000
+
+## testing under for all actitivties ##
+
+under_z = int(input("What is the mean wait time on activity 1 for %s resource(s)? " %initial_z_resource))
+under_y = int(input("What is the mean wait time on activity 2 for %s resource(s)? " %initial_y_resource))
+under_x = int(input("What is the mean wait time on activity 3 for %s resource(s)? " %initial_x_resource)) 
+
+## testing over for all activities ## 
+
+over_z = int(input("What is the mean wait time on activity 1 for %s resource(s)? " %final_z_resource))
+over_y = int(input("What is the mean wait time on activity 2 for %s resource(s)? " %final_y_resource))
+over_x = int(input("What is the mean wait time on activity 3 for %s resource(s)? " %final_x_resource))
+
+maximum_resource_allocation = int(input("What is the total number of resources you can afford? "))
+
+x_resource = 0
+prev_x_resource = final_x_resource
+y_resource = 0
+prev_y_resource = final_y_resource
+z_resource = 0
+prev_z_resource = final_z_resource
+
+## looping through ##
+
+print("Now we're going to optimise.") 
+while x_resource != prev_x_resource and y_resource != prev_y_resource and z_resource != prev_z_resource:
+    prev_x_resource = x_resource
+    x_resource = math.ceil(statistics.mean([initial_x_resource,final_x_resource]))
+    prev_y_resource = y_resource
+    y_resource = math.ceil(statistics.mean([initial_y_resource,final_y_resource]))
+    prev_z_resource = z_resource
+    z_resource = math.ceil(statistics.mean([initial_z_resource,final_z_resource]))
+    print("Test the following resource allocations: \n Activity 1: %s \n Activity 2: %s \n Activity 3: %s" %(z_resource, y_resource, x_resource))
+    middle_z = int(input("What was the mean wait time for %s resource(s) on activity 1? " %z_resource))
+    middle_y = int(input("What was the mean wait time for %s resource(s) on activity 2? " %y_resource))
+    middle_x = int(input("What was the mean wait time for %s resource(s) on activity 3? " %x_resource))    
+    
+    if middle_x == over_x:
+        final_x_resource = x_resource       
+    else:
+        initial_x_resource = x_resource
+    if middle_y == over_y:
+        final_y_resource = y_resource
+    else:
+        initial_y_resource = y_resource
+    if middle_z == over_z:
+        final_z_resource = z_resource
+    else:
+        initial_z_resource = z_resource
+
+sum_of_resources = x_resource + y_resource + z_resource
+
+## does it fit our maximum resource allocation ##
+
+if sum_of_resources < maximum_resource_allocation:
+    print("You're finished! Your optimal allocation is: \n Activity 1: %s resources \n Activity 2: %s resources \n Activity 3: %s resources. \n Thanks for playing!" %(z_resource, y_resource, x_resource))
+else:
+    print("You can't afford this allocation! Let's see how well we can do.")
+
+## reassigning our resources ##
+
+if middle_z > middle_y and middle_z > middle_x:
+    print("The longest step is step 1.")
+elif middle_y > middle_z and middle_y > middle_x:
+    print("The longest step is step 2.")
+elif middle_x > middle_y and middle_x > middle_z:
+    print("The longest step is step 3.")
+
+if middle_z > middle_y and middle_z > middle_x:
+    initial_z_resource = maximum_resource_allocation - 2
+    initial_y_resource = 1
+    initial_x_resource = 1
+elif middle_y > middle_z and middle_y > middle_x:
+    initial_y_resource = maximum_resource_allocation - 2
+    initial_x_resource = 1
+    initial_z_resource = 1
+elif middle_x > middle_z and middle_x > middle_y:
+    initial_x_resource = maximum_resource_allocation - 2
+    initial_y_resource = 1
+    initial_z_resource = 1
+
+print("Now we have to see how well we can do on the longest step.\n Test the following resource allocations: \n Activity 1: %s \n Activity 2: %s \n Activity 3: %s" %(initial_z_resource, initial_y_resource, initial_x_resource))
+constrained_z = int(input("What was the mean wait time for %s resource(s) on activity 1? " %initial_z_resource))
+constrained_y = int(input("What was the mean wait time for %s resource(s) on activity 2? " %initial_y_resource))
+constrained_x = int(input("What was the mean wait time for %s resource(s) on activity 3? " %initial_x_resource))
+
+if constrained_z > constrained_y and constrained_z > constrained_x:
+    print("Activity 1 continues to have the highest wait time with as many people assigned to it as possible.")
+    print("Here is the allocation: \n Activity 1: %s \n Activity 2: %s \n Activity 3: %s" %(initial_z_resource, initial_y_resource, initial_x_resource))
+elif constrained_y > constrained_x and constrained_y > constrained_z:
+    print("Activity 2 continues to have the highest wait time with as many people assigned to it as possible.")
+    print("Here is the allocation: \n Activity 1:  %s \n Activity 2: %s \n Activity 3: %s" %(initial_z_resource, initial_y_resource, initial_x_resource))
+elif constrained_x > constrained_y and constrained_x > constrained_z:
+    print("Activity 3 continues to have the highest wait time with as many people assigned to it as possible.")
+    print("Here is the allocation: \n Activity 1: %s \n Activity 2: %s \n Activity 3: %s" %(initial_z_resource, initial_y_resource, initial_x_resource))
+else:
+    print("We can save resource costs on this activity, let's find the minimum number of resources required on the longest activity.")
